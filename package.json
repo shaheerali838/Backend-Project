@@ -1,0 +1,22 @@
+{
+  "name": "class-5_started-on-a-project",
+  "version": "1.0.0",
+  "description": "A complete Backend Project",
+  "keywords": [
+    "express",
+    "mongo",
+    "backend",
+    "mongoose"
+  ],
+  "license": "ISC",
+  "author": "Shaheer Ali",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}
