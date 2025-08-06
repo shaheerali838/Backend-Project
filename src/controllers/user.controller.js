@@ -3,31 +3,30 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { log } from "console";
 
 const registerUser = asyncHandler(async (req, res) => {
   // get user detail from frontend
-  const { fullName, username, email, password } = req.body;
+  const { fullName, userName, email, password } = req.body;
   console.log(`fullname: ${fullName}`);
 
   // validation : not empty
 
-  if (
-    [fullName, username, email, password].some((field) => {
-      field?.trim() === "";
-    })
-  ) {
-    throw new ApiError(400, "FullName is Required");
+  if ([fullName, userName, email, password].some((field) => !field?.trim())) {
+    throw new ApiError(400, "All Fields are Required");
   }
 
-  // check if user already exist: username , email
+  // check if user already exist: userName , email
 
-  const existedUser = User.findOne({
-    $or: [{ username }, { email }],
+  const existedUser = await User.findOne({
+    $or: [{ userName }, { email }],
   });
 
   if (existedUser) {
-    throw new ApiError(409, "User with Email or Username already exist");
+    throw new ApiError(409, "User with Email or userName already exist");
   }
+  // console.log(req.files);
+
   // check for images, check for avatar
   const avatarLocalPath = req.files?.avatar[0]?.path;
   const coverImgLocalPath = req.files?.coverImage[0]?.path;
@@ -40,6 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!avatar) {
     throw new ApiError(400, "Avatar is Required");
   }
+
   // create user object - create db entry
   const user = await User.create({
     fullName,
@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
     coverImage: coverImage?.url || "",
     email,
     password,
-    username: username.toLowerCase(),
+    userName: userName.toLowerCase(),
   });
   // remove password and refresh token field from response
   const createdUser = await User.findById(user._id).select(
